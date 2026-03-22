@@ -51,9 +51,10 @@ export function calculatePrediction(
     nextSalaryDate
   )
 
-  // 5. 予測残高
+  // 5. 予測残高（基本給 + 変動給与を加算）
+  const totalSalary = settings.salaryAmount + settings.extraSalaryAmount
   const predictedBalance =
-    currentBalance - unpaidCredit - fixedExpensesUntilSalary + settings.salaryAmount
+    currentBalance - unpaidCredit - fixedExpensesUntilSalary + totalSalary
 
   const dangerLevel = getDangerLevel(predictedBalance, settings.dangerThreshold)
 
@@ -62,7 +63,7 @@ export function calculatePrediction(
     unpaidCredit,
     pendingExpenses,
     fixedExpensesUntilSalary,
-    nextSalaryAmount: settings.salaryAmount,
+    nextSalaryAmount: settings.salaryAmount + settings.extraSalaryAmount,
     predictedBalance,
     dangerLevel,
     nextSalaryDate,

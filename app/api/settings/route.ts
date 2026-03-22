@@ -25,20 +25,22 @@ export async function GET() {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json()
-    const { salaryDay, salaryAmount, dangerThreshold } = body
+    const { salaryDay, salaryAmount, extraSalaryAmount, dangerThreshold } = body
 
     const settings = await prisma.settings.upsert({
       where: { id: 'singleton' },
       update: {
         ...(salaryDay !== undefined && { salaryDay: Number(salaryDay) }),
         ...(salaryAmount !== undefined && { salaryAmount: Number(salaryAmount) }),
+        ...(extraSalaryAmount !== undefined && { extraSalaryAmount: Number(extraSalaryAmount) }),
         ...(dangerThreshold !== undefined && { dangerThreshold: Number(dangerThreshold) }),
       },
       create: {
         id: 'singleton',
         salaryDay: Number(salaryDay ?? 25),
         salaryAmount: Number(salaryAmount ?? 0),
-        dangerThreshold: Number(dangerThreshold ?? 30000),
+        extraSalaryAmount: Number(extraSalaryAmount ?? 0),
+        dangerThreshold: Number(dangerThreshold ?? 50000),
       },
     })
 

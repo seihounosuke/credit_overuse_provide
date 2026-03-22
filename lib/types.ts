@@ -46,6 +46,7 @@ export interface Settings {
   id: string
   salaryDay: number
   salaryAmount: number
+  extraSalaryAmount: number   // 今月の変動給与（ボーナス・残業代等）
   dangerThreshold: number
   createdAt: Date
   updatedAt: Date

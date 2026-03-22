@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 
 interface PredictionCardProps {
   prediction: PredictionResult
+  dangerThreshold: number
   className?: string
 }
 
@@ -30,7 +31,7 @@ const BADGE_VARIANTS: Record<string, 'safe' | 'warning' | 'danger'> = {
   danger: 'danger',
 }
 
-export function PredictionCard({ prediction, className }: PredictionCardProps) {
+export function PredictionCard({ prediction, dangerThreshold, className }: PredictionCardProps) {
   const {
     predictedBalance,
     dangerLevel,
@@ -76,7 +77,7 @@ export function PredictionCard({ prediction, className }: PredictionCardProps) {
         <DangerMeter
           level={dangerLevel}
           predictedBalance={predictedBalance}
-          threshold={50000} // TODO: settings から取得
+          threshold={dangerThreshold}
         />
 
         {/* 内訳 */}

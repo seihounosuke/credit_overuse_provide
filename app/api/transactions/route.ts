@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 
-// GET /api/transactions?limit=20&offset=0
+// GET /api/transactions?limit=20&offset=0&onlyUnpaid=true&onlyExpense=true
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const limit = Number(searchParams.get('limit') ?? 20)
@@ -57,6 +58,9 @@ export async function POST(request: NextRequest) {
       },
       include: { account: true },
     })
+
+    // ホーム画面のサーバーコンポーネントキャッシュを無効化
+    revalidatePath('/')
 
     return NextResponse.json(transaction, { status: 201 })
   } catch (error) {

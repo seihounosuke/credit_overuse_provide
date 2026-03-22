@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/accounts
@@ -29,6 +30,7 @@ export async function PATCH(request: NextRequest) {
       data: { balance: Number(balance) },
     })
 
+    revalidatePath('/')
     return NextResponse.json(account)
   } catch (error) {
     console.error('[accounts/PATCH]', error)
