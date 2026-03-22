@@ -1,11 +1,10 @@
 import Link from 'next/link'
-import { PlusCircle, Trash2 } from 'lucide-react'
+import { PlusCircle } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { calculatePrediction } from '@/lib/prediction'
 import { PredictionCard } from '@/components/PredictionCard'
-import { TransactionItem } from '@/components/TransactionItem'
+import { HomeTransactionList } from '@/components/HomeTransactionList'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import type { Account, Transaction, RecurringItem, Settings } from '@/lib/types'
 
 async function getHomeData() {
@@ -48,7 +47,7 @@ export default async function HomePage() {
   // 最近の支出（振替・引落済みを除く、最大7件）
   const recentTransactions = transactions
     .filter((t) => t.amount < 0 && !t.transferToId)
-    .slice(0, 7)
+    .slice(0, 7) as unknown as (Transaction & { account: Account })[]
 
   return (
     <div className="px-4 pt-6 pb-4 space-y-5">
@@ -85,22 +84,9 @@ export default async function HomePage() {
             </Link>
           </div>
         ) : (
-          <div className="rounded-xl border bg-card overflow-hidden">
-            {recentTransactions.map((transaction, index) => (
-              <div key={transaction.id}>
-                <TransactionItem
-                  transaction={transaction as unknown as Transaction & { account: Account }}
-                  className="px-4"
-                />
-                {index < recentTransactions.length - 1 && <Separator className="mx-4" />}
-              </div>
-            ))}
-          </div>
+          <HomeTransactionList initialTransactions={recentTransactions} />
         )}
       </div>
     </div>
   )
 }
-
-// Trash2 imported for future use
-const _ = Trash2

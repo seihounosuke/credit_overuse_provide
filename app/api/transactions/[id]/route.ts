@@ -26,12 +26,14 @@ export async function PATCH(
   try {
     const { id } = await params
     const body = await request.json()
-    const { memo, date, isExpense, expenseSettledAt } = body
+    const { amount, memo, date, isExpense, expenseSettledAt } = body
 
     const transaction = await prisma.transaction.update({
       where: { id },
       data: {
-        ...(memo !== undefined && { memo }),
+        // amount は支出なので負の値に統一する（絶対値で受け取って変換）
+        ...(amount !== undefined && { amount: -Math.abs(Number(amount)) }),
+        ...(memo !== undefined && { memo: memo || null }),
         ...(date !== undefined && { date: new Date(date) }),
         ...(isExpense !== undefined && { isExpense: Boolean(isExpense) }),
         ...(expenseSettledAt !== undefined && {
