@@ -1,0 +1,64 @@
+// This is your Prisma schema file
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 口座・資産
+model Account {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // BANK | CASH | PREPAID | CREDIT
+  balance     Float    @default(0)
+  billingDay  Int?     // クレカ引落日 (1-31)
+  color       String?  // UI表示用カラー (例: "#3b82f6")
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  transactions Transaction[]
+}
+
+// 支出・収入・振替
+model Transaction {
+  id               String    @id @default(cuid())
+  amount           Float     // 正=収入、負=支出
+  accountId        String
+  account          Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  memo             String?
+  date             DateTime  @default(now())
+  isExpense        Boolean   @default(false) // 経費立替フラグ
+  expenseSettledAt DateTime?                 // 精算予定日
+  expenseSettled   Boolean   @default(false) // 精算済みフラグ
+  isBilled         Boolean   @default(false) // クレカ引落済みフラグ
+  transferToId     String?                   // 振替先口座ID（振替時のみ）
+  createdAt        DateTime  @default(now())
+}
+
+// 固定費・定期収入
+model RecurringItem {
+  id         String   @id @default(cuid())
+  name       String
+  amount     Float    // 正=収入（給与など）、負=固定費
+  dayOfMonth Int      // 毎月何日
+  type       String   // INCOME | EXPENSE
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// アプリ設定（常に1行）
+model Settings {
+  id              String   @id @default("singleton")
+  salaryDay       Int      @default(25)  // 給料日
+  salaryAmount    Float    @default(0)   // 手取り基本給
+  dangerThreshold Float    @default(30000) // 危険ライン（円）
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
